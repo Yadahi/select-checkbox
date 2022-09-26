@@ -1,9 +1,10 @@
 import { useEffect, useRef } from "react";
 import Datatable from "./Datatable";
 
-const table = document.querySelector("#js-editable");
+const CHECKBOX_CLASS_NAME = "js-prepare-item-table-checkbox-id";
 
 function EditableTable({ data, tableItems, setTableItems, isEditable }) {
+  console.log("editable data", data);
   const savedHandleSelectCheckbox = useRef();
 
   const handleSelectCheckbox = (event) => {
@@ -26,16 +27,47 @@ function EditableTable({ data, tableItems, setTableItems, isEditable }) {
   useEffect(() => {
     const handler = (event) => savedHandleSelectCheckbox.current(event);
 
-    document.querySelector("#js-editable").addEventListener("change", handler);
-    return () =>
-      document
-        .querySelector("#js-editable")
-        .removeEventListener("change", handler);
+    document.addEventListener("change", handler);
+    return () => document.removeEventListener("change", handler);
   }, []);
 
   return (
     <div>
-      <Datatable data={data} isEditable={isEditable} id="js-editable" />
+      <Datatable
+        data={data}
+        isEditable={isEditable}
+        id="js-editable"
+        config={{
+          searching: false,
+          columns: [
+            {
+              data: "id",
+              title: "id",
+            },
+            {
+              data: "name",
+              title: "name",
+            },
+            {
+              data: "date",
+              title: "date",
+            },
+            {
+              data: "number",
+              title: "number",
+            },
+          ],
+          columnDefs: [
+            {
+              target: 0,
+              sortable: false,
+              render: function (id) {
+                return `<input type="checkbox" class="${CHECKBOX_CLASS_NAME} dataTable--checkbox" data-checkbox-id="${id}" />`;
+              },
+            },
+          ],
+        }}
+      />
     </div>
   );
 }

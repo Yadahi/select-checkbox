@@ -11,6 +11,8 @@ function SwitchTables(props) {
   const { data, isEdit, selectedValue } = props;
 
   const filteredData = filterCompany(data, selectedValue);
+  console.log("data", data);
+  console.log("filteredData", filteredData);
 
   if (isEdit) {
     return <EditableTable {...props} data={filteredData} isEditable={true} />;

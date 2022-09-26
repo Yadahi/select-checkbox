@@ -1,33 +1,47 @@
-function Datatable({ id, data, isEditable = false }) {
+import { useEffect, useState } from "react";
+
+import $jq from "jquery";
+$jq.dt = require("datatables.net");
+
+function Datatable({ id, data, isEditable = false, config }) {
+  const [error, setError] = useState(null);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [items, setItems] = useState([]);
+
+  function getTableEl() {
+    return $jq("#" + id);
+  }
+
+  useEffect(() => {
+    if (data.length > 0) {
+      setItems(data);
+    }
+  }, []);
+
+  //initialization of datatable
+  useEffect(() => {
+    if (!isLoaded) {
+      getTableEl().DataTable({
+        ...config,
+        data: items,
+      });
+      console.log("isLoaded");
+      setIsLoaded(true);
+    } else {
+      const api = getTableEl().DataTable();
+      api.clear();
+      console.log("clear");
+      api.rows.add(items);
+      api.draw();
+      console.log("draw");
+    }
+  }, [items]);
+
   return (
-    <table id={id}>
-      <thead>
-        <tr>
-          <th>id</th>
-          {isEditable && <th>input</th>}
-          <th>name</th>
-          <th>date</th>
-          <th>number</th>
-        </tr>
-      </thead>
-      <tbody>
-        {data.slice(0, 100).map((row) => {
-          return (
-            <tr key={row.id}>
-              <td>{row.id}</td>
-              {isEditable && (
-                <td>
-                  <input type="checkbox" data-checkbox-id={row.id} />
-                </td>
-              )}
-              <td>{row.name}</td>
-              <td>{row.date}</td>
-              <td>{row.number}</td>
-            </tr>
-          );
-        })}
-      </tbody>
-    </table>
+    <div className={"wrapper"}>
+      {!isLoaded && <div>Načítání...</div>}
+      <table id={id} width="100%" />
+    </div>
   );
 }
 
